@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.8.0;
+pragma abicoder v2;
 
 // A contract which has an owner.
 contract Owned {
@@ -113,6 +114,35 @@ contract MusicStore is Destructible {
         onlyOwner
     {
         owner.transfer(address(this).balance);
+    }
+    
+    /// List all available musics in this storage.
+    function listAvailableMusics()
+        public
+        view
+        returns (Music[] memory musics, uint32 total)
+    {
+        musics = new Music[](nextMusicIdx);
+        for (uint32 i = 0; i < nextMusicIdx; i++) {
+            Music memory music = storedMusics[i];
+            if (music.isAvailable) {
+                musics[total++] = music;
+            }
+        }
+    }
+    
+    /// List all musics bought by the sender.
+    function listBoughtMusics()
+        public
+        view
+        returns (Music[] memory musics)
+    {
+        uint32[] storage boughtList = boughtLists[msg.sender];
+        musics = new Music[](boughtList.length);
+        
+        for (uint32 i = 0; i < boughtList.length; i++) {
+            musics[i] = storedMusics[boughtList[i]];
+        }
     }
 
     /// Buy a music.
