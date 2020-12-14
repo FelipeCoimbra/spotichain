@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import { Contract, ContractSendMethod } from "web3-eth-contract";
-import { bytesToHex, hexToBytes } from "web3-utils";
+import { AbiItem, bytesToHex, hexToBytes } from "web3-utils";
+import ABI from "./contract.abi.json";
 
 export type Music = {
   id: number;
@@ -40,7 +41,7 @@ class MusicStoreContract {
   private _name?: string = undefined;
 
   constructor(contractAddress: string) {
-    this.web3Contract = new web3!.eth.Contract([], contractAddress);
+    this.web3Contract = new web3!.eth.Contract(ABI as AbiItem[], contractAddress);
   }
 
   public async listAvailableMusics(): Promise<Music[]> {
@@ -62,9 +63,8 @@ class MusicStoreContract {
 
 export class OwnerMusicStoreContract extends MusicStoreContract {
   public async addMusic(
-    name: string,
+    file: File,
     price: number,
-    file: File
   ): Promise<void> {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
@@ -78,7 +78,7 @@ export class OwnerMusicStoreContract extends MusicStoreContract {
       bytesBuffer[i] = buffer[i];
     }
     await this.web3Contract.methods
-      .addMusic(name, price, bytesToHex(bytesBuffer))
+      .addMusic(file.name, price, bytesToHex(bytesBuffer))
       .call();
   }
 
