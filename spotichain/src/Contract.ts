@@ -81,9 +81,13 @@ export class OwnerMusicStoreContract extends MusicStoreContract {
     for (let i = 0; i < buffer.byteLength; ++i) {
       bytesBuffer[i] = buffer[i];
     }
-    await this.web3Contract.methods
-      .addMusic(file.name, price, bytesToHex(bytesBuffer))
-      .call();
+
+    const methCall: ContractSendMethod = this.web3Contract.methods
+      .addMusic(file.name, price, bytesToHex(bytesBuffer));
+
+    const gas = await methCall.estimateGas();
+
+    await methCall.send({ from: this.account, gas });
   }
 
   public async hideMusic(name: string): Promise<void> {
