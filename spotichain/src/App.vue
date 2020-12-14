@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <div>
-      <a>Endereço da Carteira: {{ walletAddress || "Não conectado a carteira" }}</a>
+      <a
+        >Endereço da Carteira:
+        {{ walletAddress || "Não conectado a carteira" }}</a
+      >
     </div>
     <div>
       <a>Endereço da Loja:</a>
@@ -11,9 +14,9 @@
 
     <div v-if="isOwner">
       <a>Adicionar Música:</a>
-      <input type="file" ref="addMusicFileInput"/>
+      <input type="file" ref="addMusicFileInput" />
       <a>Preço (em wei):</a>
-      <input type="number" v-model="price"/>
+      <input type="number" v-model="price" />
       <button @click="addMusic">ADICIONAR</button>
     </div>
 
@@ -66,7 +69,9 @@ export default class App extends Vue {
   }
 
   get isOwner(): boolean {
-    return this.ownerAddress.length != 0 && this.ownerAddress == this.walletAddress;
+    return (
+      this.ownerAddress.length != 0 && this.ownerAddress == this.walletAddress
+    );
   }
 
   private async changeToBuyer(): Promise<BuyerMusicStoreContract> {
@@ -129,7 +134,9 @@ export default class App extends Vue {
   }
 
   private async addMusic(): Promise<void> {
-    const file = (this.$refs.addMusicFileInput as HTMLInputElement).files!.item(0);
+    const file = (this.$refs.addMusicFileInput as HTMLInputElement).files!.item(
+      0
+    );
     if (!file) throw "missing file";
 
     const contract = await this.changeToOwner();

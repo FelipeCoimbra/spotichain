@@ -1,4 +1,4 @@
-[
+export default JSON.parse(`[
   {
     "inputs": [
       {
@@ -206,4 +206,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+]`);
