@@ -1,11 +1,6 @@
+import Web3 from "web3";
 import { Contract, ContractSendMethod } from "web3-eth-contract";
-import { bytesToHex, hexToBytes, AbiItem } from "web3-utils";
-
-type Web3EthContractModule = {
-  setProvider: (host: string) => void
-} & (new (x: AbiItem[], y: string, z: { from: string }) => Contract);
-
-const Web3Contract: Web3EthContractModule  = require("web3-eth-contract");
+import { bytesToHex, hexToBytes } from "web3-utils";
 
 export type Music = {
   id: number;
@@ -13,19 +8,39 @@ export type Music = {
   price: number;
 };
 
+declare global {
+  interface Ethereum {
+    isMetaMask: boolean;
+    request(options: { method: "eth_requestAccounts" }): Promise<string[]>;
+  }
+
+  interface Window {
+    ethereum: Ethereum | undefined;
+  }
+}
+
+let web3: Web3 | undefined;
+
+export async function metamaskConnect(): Promise<string> {
+  if (!window.ethereum) {
+    throw "missing metamask";
+  }
+
+  const accounts = await window.ethereum.request({
+    method: "eth_requestAccounts"
+  });
+  web3 = new Web3(window.ethereum as any);
+  web3.eth.defaultAccount = accounts[0];
+  return accounts[0];
+}
+
 class MusicStoreContract {
   protected web3Contract: Contract;
   private _owner?: string = undefined;
   private _name?: string = undefined;
 
-  public static setProvider(host: string) {
-    Web3Contract.setProvider(host);
-  }
-
-  constructor(walletAdress: string, contractAddress: string) {
-    this.web3Contract = new Web3Contract([], contractAddress, {
-      from: walletAdress
-    });
+  constructor(contractAddress: string) {
+    this.web3Contract = new web3!.eth.Contract([], contractAddress);
   }
 
   public async listAvailableMusics(): Promise<Music[]> {
@@ -86,10 +101,12 @@ export class BuyerMusicStoreContract extends MusicStoreContract {
   }
 
   public async buyMusic(name: string, price: number): Promise<void> {
-    await (this.web3Contract.methods.buyMusic(name) as ContractSendMethod).send({ 
-      from: this.web3Contract.defaultAccount!,
-      value: price,
-     });
+    await (this.web3Contract.methods.buyMusic(name) as ContractSendMethod).send(
+      {
+        from: web3!.defaultAccount!,
+        value: price
+      }
+    );
   }
 
   public async getMusicContent(name: string): Promise<number[]> {

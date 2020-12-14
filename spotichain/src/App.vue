@@ -1,18 +1,15 @@
 <template>
   <div id="app">
-    <a>Rede Ethereum:</a>
-    <input type="text" v-model="network"/>
     <a>Endereço da Loja:</a>
     <input type="text" v-model="contractAddress" />
-    <a>Endereço da Carteira:</a>
-    <input type="text" v-model="walletAdress" />
+    <a>Endereço da Carteira: {{ walletAddress }}</a>
     <button @click="goToShop">VISITAR</button>
 
     <table v-if="!!availableMusics.length">
       <tr>
-          <th>Nome</th>
-          <th>Preço</th>
-          <th>Ações</th>
+        <th>Nome</th>
+        <th>Preço</th>
+        <th>Ações</th>
       </tr>
       <tr v-for="music in availableMusics" :key="music.id">
         <td>{{ music.name }}</td>
@@ -35,7 +32,8 @@ import { Component, Vue } from "vue-property-decorator";
 import {
   BuyerMusicStoreContract,
   OwnerMusicStoreContract,
-  Music
+  Music,
+  metamaskConnect
 } from "./Contract";
 import { downloadFile } from "./download";
 import Web3 from "web3";
@@ -50,7 +48,6 @@ export default class App extends Vue {
   private availableMusics: MusicListItem[] = [];
   private name = "";
   private ownerAddress = "";
-  private network = "";
 
   get canCallContractMethods(): boolean {
     return this.contractAddress.length != 0;
@@ -60,23 +57,23 @@ export default class App extends Vue {
     return this.ownerAddress == this.walletAddress;
   }
 
-  private changeToBuyer(): BuyerMusicStoreContract {
+  private async changeToBuyer(): Promise<BuyerMusicStoreContract> {
+    if (this.contract == undefined) {
+      this.walletAddress = await metamaskConnect();
+    }
     if (!(this.contract instanceof BuyerMusicStoreContract)) {
-      this.contract = new BuyerMusicStoreContract(
-        this.walletAddress,
-        this.contractAddress
-      );
+      this.contract = new BuyerMusicStoreContract(this.contractAddress);
     }
 
     return this.contract;
   }
 
-  private changeToOwner(): OwnerMusicStoreContract {
+  private async changeToOwner(): Promise<OwnerMusicStoreContract> {
+    if (this.contract == undefined) {
+      this.walletAddress = await metamaskConnect();
+    }
     if (!(this.contract instanceof OwnerMusicStoreContract)) {
-      this.contract = new OwnerMusicStoreContract(
-        this.walletAddress,
-        this.contractAddress
-      );
+      this.contract = new OwnerMusicStoreContract(this.contractAddress);
     }
 
     return this.contract;
@@ -88,8 +85,7 @@ export default class App extends Vue {
   }
 
   private async goToShop(): Promise<void> {
-    OwnerMusicStoreContract.setProvider(this.network);
-    const contract = this.changeToBuyer();
+    const contract = await this.changeToBuyer();
     const contractOwner = contract.owner();
     const listAvailableMusics = contract.listAvailableMusics();
 
@@ -109,13 +105,13 @@ export default class App extends Vue {
   }
 
   private async buyMusic(music: MusicListItem): Promise<void> {
-    const contract = this.changeToBuyer();
+    const contract = await this.changeToBuyer();
     await contract.buyMusic(music.name, music.price);
     music.isBought = true;
   }
 
   private async getMusicContent(music: MusicListItem): Promise<void> {
-    const contract = this.changeToBuyer();
+    const contract = await this.changeToBuyer();
     const bytes = await contract.getMusicContent(music.name);
     await downloadFile(music.name, bytes);
   }
