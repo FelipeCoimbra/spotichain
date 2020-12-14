@@ -35,8 +35,6 @@ contract MusicStore is Destructible {
         uint32 id;
         // Name of the music.
         string name;
-        // Duration of the music.
-        uint32 duration;
         // Price to be paid for the music.
         uint256 price;
         // Is this music available to be bought.
@@ -67,7 +65,6 @@ contract MusicStore is Destructible {
 
     /// Adds a new music to the store.
     function addMusic(string calldata _name,
-                      uint32 _duration,
                       uint32 _price,
                       bytes memory _content)
         public
@@ -78,7 +75,6 @@ contract MusicStore is Destructible {
         Music storage newMusic = storedMusics[musicID];
         newMusic.id = musicID;
         newMusic.name = _name;
-        newMusic.duration = _duration;
         newMusic.price = _price;
         newMusic.isAvailable = true;
         musicsContent[musicID] = _content;
@@ -115,7 +111,7 @@ contract MusicStore is Destructible {
     {
         owner.transfer(address(this).balance);
     }
-    
+
     /// List all available musics in this storage.
     function listAvailableMusics()
         public
@@ -130,7 +126,7 @@ contract MusicStore is Destructible {
             }
         }
     }
-    
+
     /// List all musics bought by the sender.
     function listBoughtMusics()
         public
@@ -139,7 +135,7 @@ contract MusicStore is Destructible {
     {
         uint32[] storage boughtList = boughtLists[msg.sender];
         musics = new Music[](boughtList.length);
-        
+
         for (uint32 i = 0; i < boughtList.length; i++) {
             musics[i] = storedMusics[boughtList[i]];
         }
