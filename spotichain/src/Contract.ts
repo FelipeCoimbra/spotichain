@@ -47,6 +47,10 @@ class MusicStoreContract {
     );
   }
 
+  protected get account(): string {
+    return web3!.eth.defaultAccount!;
+  }
+
   public async listAvailableMusics(): Promise<Music[]> {
     return (await this.web3Contract.methods.listAvailableMusics().call())[0];
   }
@@ -103,7 +107,7 @@ export class BuyerMusicStoreContract extends MusicStoreContract {
   public async buyMusic(name: string, price: number): Promise<void> {
     await (this.web3Contract.methods.buyMusic(name) as ContractSendMethod).send(
       {
-        from: web3!.defaultAccount!,
+        from: this.account,
         value: price
       }
     );
