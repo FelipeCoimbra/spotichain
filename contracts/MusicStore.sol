@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.8.0;
+pragma solidity >=0.7.5 <0.8.0;
 pragma abicoder v2;
 
 // A contract which has an owner.
