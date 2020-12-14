@@ -1,9 +1,21 @@
 <template>
   <div id="app">
-    <a>Endereço da Loja:</a>
-    <input type="text" v-model="contractAddress" />
-    <a>Endereço da Carteira: {{ walletAddress }}</a>
-    <button @click="goToShop">VISITAR</button>
+    <div>
+      <a>Endereço da Carteira: {{ walletAddress || "Não conectado a carteira" }}</a>
+    </div>
+    <div>
+      <a>Endereço da Loja:</a>
+      <input type="text" v-model="contractAddress" />
+      <button @click="goToShop">VISITAR</button>
+    </div>
+
+    <div v-if="isOwner">
+      <a>Adicionar Música:</a>
+      <input type="file" ref="addMusicFileInput"/>
+      <a>Preço (em wei):</a>
+      <input type="number" v-model="price"/>
+      <button @click="addMusic">ADICIONAR</button>
+    </div>
 
     <table v-if="!!availableMusics.length">
       <tr>
@@ -46,15 +58,15 @@ export default class App extends Vue {
   private contractAddress = "";
   private walletAddress = "";
   private availableMusics: MusicListItem[] = [];
-  private name = "";
   private ownerAddress = "";
+  private price = 0;
 
   get canCallContractMethods(): boolean {
     return this.contractAddress.length != 0;
   }
 
   get isOwner(): boolean {
-    return this.ownerAddress == this.walletAddress;
+    return this.ownerAddress.length != 0 && this.ownerAddress == this.walletAddress;
   }
 
   private async changeToBuyer(): Promise<BuyerMusicStoreContract> {
@@ -114,6 +126,15 @@ export default class App extends Vue {
     const contract = await this.changeToBuyer();
     const bytes = await contract.getMusicContent(music.name);
     await downloadFile(music.name, bytes);
+  }
+
+  private async addMusic(): Promise<void> {
+    const file = (this.$refs.addMusicFileInput as HTMLInputElement).files!.item(0);
+    if (!file) throw "missing file";
+
+    const contract = await this.changeToOwner();
+
+    contract.addMusic(file, this.price);
   }
 }
 </script>
