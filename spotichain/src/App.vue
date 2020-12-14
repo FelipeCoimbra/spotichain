@@ -65,18 +65,23 @@ export default class App extends Vue {
   private price = 0;
 
   get canCallContractMethods(): boolean {
-    return this.contractAddress.length != 0;
+    return this.contractAddress.length !== 0;
   }
 
   get isOwner(): boolean {
     return (
-      this.ownerAddress.length != 0 && this.ownerAddress == this.walletAddress
+      this.ownerAddress.length !== 0 && this.ownerAddress === this.walletAddress
     );
+  }
+
+  private translateAddress(addr: string): string {
+    addr = addr.toLocaleUpperCase().slice(2);
+    return `0x${addr}`;
   }
 
   private async changeToBuyer(): Promise<BuyerMusicStoreContract> {
     if (this.contract == undefined) {
-      this.walletAddress = await metamaskConnect();
+      this.walletAddress = this.translateAddress(await metamaskConnect());
     }
     if (!(this.contract instanceof BuyerMusicStoreContract)) {
       this.contract = new BuyerMusicStoreContract(this.contractAddress);
@@ -87,7 +92,7 @@ export default class App extends Vue {
 
   private async changeToOwner(): Promise<OwnerMusicStoreContract> {
     if (this.contract == undefined) {
-      this.walletAddress = await metamaskConnect();
+      this.walletAddress = this.translateAddress(await metamaskConnect());
     }
     if (!(this.contract instanceof OwnerMusicStoreContract)) {
       this.contract = new OwnerMusicStoreContract(this.contractAddress);
@@ -97,7 +102,7 @@ export default class App extends Vue {
   }
 
   private setOwnerAddress(owner: string): void {
-    this.ownerAddress = owner;
+    this.ownerAddress = this.translateAddress(owner);
     this.changeToOwner();
   }
 
@@ -114,17 +119,18 @@ export default class App extends Vue {
     this.setOwnerAddress(owner);
     const bought = this.isOwner ? [] : await contract.listBoughtMusics();
 
-    (available as MusicListItem[]).forEach(
-      m => (m = { ...m, isBought: !!bought.find(b => b.id == m.id) })
-    );
-
-    this.availableMusics = available as MusicListItem[];
+    this.availableMusics = available.map(m => ({
+      id: m.id,
+      name: m.name,
+      price: m.price,
+      isBought: !!bought.find(b => b.id == m.id)
+    }));
   }
 
   private async buyMusic(music: MusicListItem): Promise<void> {
     const contract = await this.changeToBuyer();
     await contract.buyMusic(music.name, music.price);
-    music.isBought = true;
+    this.$set(music, "isBought", true);
   }
 
   private async getMusicContent(music: MusicListItem): Promise<void> {

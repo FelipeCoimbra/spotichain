@@ -114,7 +114,7 @@ export class BuyerMusicStoreContract extends MusicStoreContract {
   }
 
   public async getMusicContent(name: string): Promise<number[]> {
-    const result = this.web3Contract.methods.getMusicContent(name).call();
+    const result = await this.web3Contract.methods.getMusicContent(name).call();
     return hexToBytes(result);
   }
 }
