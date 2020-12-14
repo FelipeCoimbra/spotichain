@@ -114,8 +114,8 @@ export default class App extends Vue {
     this.setOwnerAddress(owner);
     const bought = this.isOwner ? [] : await contract.listBoughtMusics();
 
-    available.forEach(
-      m => ((m as MusicListItem).isBought = !!bought.find(b => b.id == m.id))
+    (available as MusicListItem[]).forEach(
+      m => (m = { ...m, isBought: !!bought.find(b => b.id == m.id) })
     );
 
     this.availableMusics = available as MusicListItem[];

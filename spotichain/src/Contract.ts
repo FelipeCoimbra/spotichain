@@ -48,7 +48,7 @@ class MusicStoreContract {
   }
 
   public async listAvailableMusics(): Promise<Music[]> {
-    return this.web3Contract.methods.listAvailableMusics().call();
+    return (await this.web3Contract.methods.listAvailableMusics().call())[0];
   }
 
   public async owner(): Promise<string> {
@@ -97,7 +97,7 @@ export class OwnerMusicStoreContract extends MusicStoreContract {
 
 export class BuyerMusicStoreContract extends MusicStoreContract {
   public async listBoughtMusics(): Promise<Music[]> {
-    return this.web3Contract.methods.listAvailableMusics();
+    return this.web3Contract.methods.listBoughtMusics().call();
   }
 
   public async buyMusic(name: string, price: number): Promise<void> {
@@ -110,7 +110,7 @@ export class BuyerMusicStoreContract extends MusicStoreContract {
   }
 
   public async getMusicContent(name: string): Promise<number[]> {
-    const result = await this.web3Contract.methods.getMusicContent(name).call();
+    const result = this.web3Contract.methods.getMusicContent(name).call();
     return hexToBytes(result);
   }
 }

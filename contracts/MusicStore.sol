@@ -42,7 +42,7 @@ contract MusicStore is Destructible {
     }
 
     /// The name of the store.
-    bytes32 public name;
+    string public name;
 
     // Musics stored in the store.
     mapping(uint32 => Music) storedMusics;
@@ -54,7 +54,7 @@ contract MusicStore is Destructible {
     // List of musics that each user bought from this store.
     mapping(address => uint32[]) boughtLists;
 
-    constructor(bytes32 _name) {
+    constructor(string memory _name) {
         name = _name;
     }
 
