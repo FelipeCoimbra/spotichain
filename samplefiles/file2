@@ -1,0 +1,18 @@
+@article{10.1093/imammb/1.3.233,
+    author = {ANDERSON, ROY M. and MAY, ROBERT M.},
+    title = "{Spatial, Temporal, and Genetic Heterogeneity in Host Populations And the Design of Immunization Programmes}",
+    journal = {Mathematical Medicine and Biology: A Journal of the IMA},
+    volume = {1},
+    number = {3},
+    pages = {233-266},
+    year = {1984},
+    month = {01},
+    abstract = "{The relevance of heterogeneity in infectious disease transmission to the design of immunization programmes is examined by the use of simple deterministic models of recurrent epidemic behaviour. In the context of spatial heterogeneity it is shown that an optimal vaccination programme, which concentrates on groups with relatively high density, can lead to eradication with overall coverage levels less than those estimated by a model which assumes homogeneity in host spatial distribution. Age-related heterogeneity in transmission can result in higher or lower coverage levels than those predicted by models which assume age-independent transmission, depending on the quantitative detail of how transmission changes with age. Genetic heterogeneity in host susceptibility to infection is shown to produce effects that are similar to those induced by age-related changes in transmission. It is concluded that much greater attention should be focused on transmission heterogeneity in future work on models of recurrent epidemic behaviour and the design of immunization programmes.}",
+    issn = {1477-8599},
+    doi = {10.1093/imammb/1.3.233},
+    url = {https://doi.org/10.1093/imammb/1.3.233},
+    eprint = {https://academic.oup.com/imammb/article-pdf/1/3/233/2515247/1-3-233.pdf},
+}
+
+
+

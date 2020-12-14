@@ -25,8 +25,6 @@ geth --nousb \
 account new --password $ACCESSNODE_DIR/accesspwd \
 2>>$ACCESSNODE_DIR/geth.log
 
-echo "oi"
-
 ##
 ## Start Access Node + Mining thread
 ##

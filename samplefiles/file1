@@ -1,0 +1,63 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct TrieNode
+{
+    int counter;
+    vector<TrieNode *> next;
+    bool terminal;
+    TrieNode(int x) : counter(x), next(vector<TrieNode *>(26, nullptr)), terminal(false) {}
+};
+
+int T, N, K, ans;
+string s;
+TrieNode *root;
+
+void addWord(string word)
+{
+    TrieNode *node = root;
+    for (char c : word)
+    {
+        if (!node->next[c - 'A'])
+            node->next[c - 'A'] = new TrieNode(0);
+        node = node->next[c - 'A'];
+        node->counter++;
+    }
+    node->terminal = true;
+}
+
+int dfs(TrieNode *node, int d)
+{
+    if (!node)
+        return 0;
+    int cost = 0;
+    for (TrieNode *neigh : node->next)
+        cost += dfs(neigh, d + 1);
+    ans += max(0, d * ((node->counter - cost) / (K)));
+    cost += max(0, K * ((node->counter - cost) / (K)));
+    return cost;
+}
+
+void solve()
+{
+    cin >> N >> K;
+    ans = 0;
+    root = new TrieNode(0);
+    for (int i = 0; i < N; i++)
+        cin >> s, addWord(s);
+    for (int i = 0; i < 26; i++)
+        dfs(root->next[i], 1);
+    cout << ans << endl;
+}
+
+int main()
+{
+    cin >> T;
+    int i = 1;
+    while (T--)
+    {
+        cout << "Case #" << i++ << ": ";
+        solve();
+    }
+    return 0;
+}
